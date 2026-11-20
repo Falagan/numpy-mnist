@@ -2,7 +2,7 @@
 
 A first project with NumPy, and with the tools of every software project: Git, a fork, a virtual environment, tests and continuous integration.
 
-MNIST is a classic dataset of 70,000 handwritten digits, each a 28×28 grid of numbers. Loaded into Python, a set of images is just a NumPy array, of shape 60,000×28×28 for the training set, so everything you do to images (scaling them, adding noise, shifting and cropping them) is array manipulation. The [exercises](mnist_numpy.ipynb) go from shapes and data types to normalisation without leakage, loops against vectorisation, and data augmentation by hand. Tests check your answers, and a [solution](mnist_numpy_solution.ipynb) compares alternative ways of solving each exercise.
+MNIST is a classic dataset of 70,000 handwritten digits, each a 28×28 grid of numbers. Loaded into Python, a set of images is just a NumPy array, of shape 60,000×28×28 for the training set, so everything you do to images (scaling them, adding noise, shifting and cropping them) is array manipulation. The [exercises](mnist_numpy.ipynb) go from shapes and data types to normalisation without leakage, loops against vectorisation, and data augmentation by hand. Tests check your answers, and a [solution](mnist_numpy_solution.ipynb) compares alternative ways of solving each exercise. A [last notebook](vectorised_shift.ipynb) goes further: the shift of the augmentation without a loop, and where its time goes.
 
 ## What you need
 
@@ -53,6 +53,15 @@ uv run pytest        # with conda, or with the environment activated: pytest
 
 The tests run your notebook from top to bottom and check every name the exercises ask for. Before you solve anything, all of them fail but one, which checks that the notebook runs, and each failure names the exercise it is waiting for. The first run downloads MNIST (11 MB) into `data/`, which git ignores.
 
+Each test is named after the exercise it checks (`test_e7_onehot_encoding` checks exercise 7), so while you work on one exercise you can see only its results, or stop at the first failure:
+
+```bash
+uv run pytest -k e7_    # only the tests of exercise 7
+uv run pytest --sw      # stop at the first failing test; the next run starts from that one
+```
+
+`-k` selects every test whose name contains the text, so keep the underscore: `-k e1` would also select exercises 10 to 19. Both options still run the whole notebook: they shorten the output, not the run. Exercises 4, 8 and 16 ask for no name, so they have no test.
+
 ### 4. Turn on continuous integration
 
 The file `.github/workflows/tests.yml` asks GitHub to run the same tests on its own servers every time you push: that is **continuous integration** (CI). GitHub keeps workflows switched off in a new fork until you allow them: open the *Actions* tab of your fork and enable them. From then on, every commit you push shows a green tick when the tests pass, or a red cross with the failing tests in its log.
@@ -78,9 +87,9 @@ git push -u origin exercises     # the first time; then just git push
 
 ### 6. Open a pull request for feedback
 
-A **pull request** proposes the commits of a branch for merging into another branch, and shows them as a diff that others can comment on. Once you have solved some exercises, open one from the `exercises` branch of your fork into the `main` branch of this repository: on your fork's page on GitHub, press *Contribute*, then *Open pull request*. Before you send it, read it as a reviewer would: the diff, the result of the tests, what you would change.
+A **pull request** proposes the commits of a branch for merging into another branch, and shows them as a diff that others can comment on. Once you have solved some exercises, open one from the `exercises` branch of your fork into the `main` branch of this repository: on your fork's page on GitHub, press *Contribute*, then *Open pull request*. Before you send it, check that the last commit you pushed has its green tick, and read the pull request as a reviewer would: the diff, what you would change. In its description, write what you found difficult and any question you have.
 
-The tests run on your pull request, and the feedback comes as comments on its diff. Keep pushing to `exercises`: the pull request updates itself with every new commit. When the review is done, it is closed without merging, so that `main` keeps the exercises unsolved for everyone.
+The tests run in your fork, on every push, not in the pull request: the tick on your last commit is the result the review starts from. The feedback comes as comments on the diff. Keep pushing to `exercises`: the pull request updates itself with every new commit. When the review is done, it is closed without merging, so that `main` keeps the exercises unsolved for everyone.
 
 Pull requests that improve the exercises themselves (a typo, an unclear statement, a missing test) are welcome, and those are merged. Send them from a branch of their own, not from `exercises`.
 
@@ -100,7 +109,7 @@ $env:MNIST_NOTEBOOK="mnist_numpy_solution.ipynb"; uv run pytest
 
 ## Working with an AI assistant
 
-Once you have solved the exercises, ask an assistant for another way to solve two of them, time both versions, and write down which one is better and why.
+Once you have solved the exercises, ask an assistant for another way to solve two of them, check that its version returns the same result as yours (`np.array_equal`, or `np.allclose` for floats), and write down which one is better and why.
 
 ## Keeping your fork up to date
 
@@ -112,6 +121,7 @@ If this repository changes after you fork it, GitHub's *Sync fork* button, on yo
 | --- | --- |
 | [`mnist_numpy.ipynb`](mnist_numpy.ipynb) | The exercises |
 | [`mnist_numpy_solution.ipynb`](mnist_numpy_solution.ipynb) | A solution, with alternatives compared |
-| [`tests/test_mnist_numpy.py`](tests/test_mnist_numpy.py) | The tests, one or more per exercise |
+| [`vectorised_shift.ipynb`](vectorised_shift.ipynb) | Exercise 22's shift without a loop, checked and timed part by part |
+| [`tests/test_mnist_numpy.py`](tests/test_mnist_numpy.py) | The tests, each named after the exercise it checks |
 | [`.github/workflows/tests.yml`](.github/workflows/tests.yml) | The continuous-integration workflow |
 | `requirements.txt`, `pytest.ini` | The packages, and the tests' settings (warnings count as errors) |

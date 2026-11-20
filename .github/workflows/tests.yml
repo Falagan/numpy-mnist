@@ -1,17 +1,26 @@
 name: tests
 
-on: [push, pull_request]
+# Push only: a fork's own run is the result. A pull request into the original would run a stranger's
+# code there, which GitHub holds for approval on every push of a contributor never merged.
+on: push
+
+# The tests only read the repository: the token gets nothing else, whatever the repository's settings.
+permissions:
+  contents: read
 
 jobs:
   exercises:
     runs-on: ubuntu-latest
     steps:
+      # pip's packages and the notebook run next: the checkout doesn't leave the token behind for them.
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
       - run: pip install -r requirements.txt
-      # The original's own code checks its solution; a fork's code, pushed or in a pull request, its exercise notebook.
+      # The original checks its solution; a fork, its exercise notebook.
       - run: pytest
         env:
-          MNIST_NOTEBOOK: ${{ (github.event.pull_request.head.repo.owner.login || github.repository_owner) == 'avidaldo' && 'mnist_numpy_solution.ipynb' || 'mnist_numpy.ipynb' }}
+          MNIST_NOTEBOOK: ${{ github.repository_owner == 'avidaldo' && 'mnist_numpy_solution.ipynb' || 'mnist_numpy.ipynb' }}
